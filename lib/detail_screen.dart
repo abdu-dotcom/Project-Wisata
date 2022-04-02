@@ -1,97 +1,132 @@
 import 'package:flutter/material.dart';
+import 'package:project_wisata/model/tourism_place.dart';
 
 class DetailScreen extends StatelessWidget {
+  final TourismPlace place;
+
+  DetailScreen({required this.place});
+
   Widget build(BuildContext context) {
     return Scaffold(
-        body: SafeArea(
-            child: SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
-          Image.asset('images/farm-house.jpg'),
-          Container(
-              margin: EdgeInsets.only(top: 16.0),
-              child: const Text(
-                'Farm House Lembang',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                    fontSize: 30,
-                    fontWeight: FontWeight.bold,
-                    fontFamily: 'Oxygen'),
-              )),
-          Container(
-            margin: EdgeInsets.symmetric(vertical: 16.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: <Widget>[
-                Column(
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              Stack(
+                children: <Widget>[
+                  Image.asset(place.imageAsset),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      CircleAvatar(
+                        backgroundColor: Colors.grey,
+                        child: IconButton(
+                          icon: const Icon(
+                            Icons.arrow_back,
+                            color: Colors.white,
+                          ),
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                        ),
+                      ),
+                      FavoriteButton(),
+                    ],
+                  ),
+                ],
+              ),
+              Container(
+                  margin: const EdgeInsets.only(top: 16.0),
+                  child: Text(
+                    place.name,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                        fontSize: 30,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'Oxygen'),
+                  )),
+              Container(
+                margin: const EdgeInsets.symmetric(vertical: 16.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: <Widget>[
-                    Icon(Icons.calendar_today),
-                    SizedBox(height: 8.0),
-                    Text('Open Everyday')
-                  ],
-                ),
-                Column(
-                  children: <Widget>[
-                    Icon(Icons.timelapse),
-                    SizedBox(
-                      height: 8.0,
+                    Column(
+                      children: <Widget>[
+                        const Icon(Icons.calendar_today),
+                        const SizedBox(height: 8.0),
+                        Text(place.openDays)
+                      ],
                     ),
-                    Text('09.00 - 20.00')
+                    Column(
+                      children: <Widget>[
+                        const Icon(Icons.timelapse),
+                        const SizedBox(
+                          height: 8.0,
+                        ),
+                        Text(place.openTime)
+                      ],
+                    ),
+                    Column(
+                      children: <Widget>[
+                        const Icon(Icons.money),
+                        const SizedBox(height: 8.0),
+                        Text(place.ticketPrice)
+                      ],
+                    ),
                   ],
                 ),
-                Column(
-                  children: <Widget>[
-                    Icon(Icons.money),
-                    SizedBox(height: 8.0),
-                    Text('Rp 25.000')
-                  ],
+              ),
+              Container(
+                margin: const EdgeInsets.only(left: 24.0, right: 24.0),
+                child: Text(
+                  place.description,
+                  textAlign: TextAlign.justify,
+                  style: const TextStyle(fontSize: 16.0),
                 ),
-              ],
-            ),
+              ),
+              SizedBox(
+                height: 200,
+                child: Container(
+                  margin: const EdgeInsets.only(top: 20.0),
+                  child: ListView(
+                    scrollDirection: Axis.horizontal,
+                    children: place.imageUrls.map((url) {
+                      return Padding(
+                        padding: const EdgeInsets.all(4.0),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(16.0),
+                          child: Image.network(url),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ),
+              ),
+            ],
           ),
-          Container(
-            margin: EdgeInsets.only(left: 24.0, right: 24.0),
-            child: Text(
-              'Berada di jalur utama Bandung-Lembang, Farm House menjadi objek wisata yang tidak pernah sepi pengunjung. Selain karena letaknya strategis, kawasan ini juga menghadirkan nuansa wisata khas Eropa. Semua itu diterapkan dalam bentuk spot swafoto Instagramable.',
-              textAlign: TextAlign.justify,
-              style: TextStyle(fontSize: 16.0),
-            ),
-          ),
-          SizedBox(
-            height: 300,
-            child: ListView(
-              scrollDirection: Axis.horizontal,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(4.0),
-                  child: ClipRRect(
-                    child: Image.network(
-                        'https://media-cdn.tripadvisor.com/media/photo-s/0d/7c/59/70/farmhouse-lembang.jpg'),
-                    borderRadius: BorderRadius.circular(16.0),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(4.0),
-                  child: ClipRRect(
-                    child: Image.network(
-                        'https://media-cdn.tripadvisor.com/media/photo-w/13/f0/22/f6/photo3jpg.jpg'),
-                    borderRadius: BorderRadius.circular(16.0),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(4.0),
-                  child: ClipRRect(
-                    child: Image.network(
-                        'https://media-cdn.tripadvisor.com/media/photo-m/1280/16/a9/33/43/liburan-di-farmhouse.jpg'),
-                    borderRadius: BorderRadius.circular(16.0),
-                  ),
-                ),
-              ],
-            ),
-          )
-        ],
+        ),
       ),
-    )));
+    );
+  }
+}
+
+class FavoriteButton extends StatefulWidget {
+  @override
+  _FavoriteButtonState createState() => _FavoriteButtonState();
+}
+
+class _FavoriteButtonState extends State<FavoriteButton> {
+  bool isFavorite = false;
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      icon: Icon(isFavorite ? Icons.favorite : Icons.favorite_border),
+      onPressed: () {
+        setState(() {
+          isFavorite = !isFavorite;
+        });
+      },
+    );
   }
 }
